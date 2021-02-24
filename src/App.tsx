@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect } from "react";
 import clsx from "clsx";
 import { Tool, useToolsReducer } from "./useTools";
 
