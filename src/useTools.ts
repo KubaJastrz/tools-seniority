@@ -2,41 +2,53 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { useReducer } from "react";
 import { mapDispatchToActions } from "./utils";
 
+enum ToolCategory {
+  Uncategorized,
+  Beginner,
+  SelfSufficient,
+  Advanced,
+  Mastery,
+}
+
 export interface Tool {
   id: string;
   label: string;
+  category: ToolCategory;
 }
 
 interface ToolsState {
   tools: Tool[];
-  beginner: Tool[];
-  selfSufficient: Tool[];
-  advanced: Tool[];
-  mastery: Tool[];
 }
 
 const initialState: ToolsState = {
-  tools: [{ id: "test", label: "test" }],
-  beginner: [{ id: "another", label: "label" }],
-  selfSufficient: [],
-  advanced: [],
-  mastery: [],
+  tools: [
+    { id: "test", label: "test", category: ToolCategory.Uncategorized },
+    { id: "test2", label: "test2", category: ToolCategory.Beginner },
+  ],
 };
 
 const toolsSlice = createSlice({
   name: "tools",
   initialState,
   reducers: {
-    moveToBeginner(state, action: PayloadAction<Tool["id"]>) {
-      const index = state.tools.findIndex((tool) => tool.id === action.payload);
-      if (index === -1) {
-        throw new Error(`tool is missing: ${action.payload}`);
-      }
-      const [tool] = state.tools.splice(index, 1);
-      state.beginner.push(tool);
-    },
+    moveToBeginner: stateTransitionReducer(ToolCategory.Beginner),
+    moveToSelfSufficient: stateTransitionReducer(ToolCategory.SelfSufficient),
+    moveToAdvanced: stateTransitionReducer(ToolCategory.Advanced),
+    moveToMastery: stateTransitionReducer(ToolCategory.Mastery),
+    moveToTools: stateTransitionReducer(ToolCategory.Uncategorized),
   },
 });
+
+function stateTransitionReducer(targetCategory: ToolCategory) {
+  return (state: ToolsState, action: PayloadAction<Tool["id"]>) => {
+    state.tools = state.tools.map((tool) => {
+      if (tool.id === action.payload) {
+        return { ...tool, category: targetCategory };
+      }
+      return tool;
+    });
+  };
+}
 
 export function useToolsReducer() {
   const [state, dispatch] = useReducer(toolsSlice.reducer, initialState);
@@ -44,6 +56,16 @@ export function useToolsReducer() {
 
   return {
     state,
+    lists: {
+      uncategorized: filterList(ToolCategory.Uncategorized, state.tools),
+      beginner: filterList(ToolCategory.Beginner, state.tools),
+      selfSufficient: filterList(ToolCategory.SelfSufficient, state.tools),
+      advanced: filterList(ToolCategory.Advanced, state.tools),
+      mastery: filterList(ToolCategory.Mastery, state.tools),
+    },
     actions,
   };
 }
+
+const filterList = (category: ToolCategory, list: Tool[]) =>
+  list.filter((tool) => tool.category === category);

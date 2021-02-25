@@ -13,14 +13,11 @@ function TargetArea({ tools, placeholder = "" }: TargetAreaProps) {
       {tools.length > 0 ? (
         <ul className="flex flex-wrap -m-0.75">
           {tools.map((tool) => {
-            // TODO
-            const isGrabbing = false;
             return (
               <li
                 key={tool.id}
                 className={clsx(
-                  "inline-block px-1 text-sm rounded-sm border select-none m-0.75",
-                  isGrabbing ? "cursor-grabbing" : "cursor-grab",
+                  "inline-block px-1 text-sm rounded-sm border select-none m-0.75 cursor-grab",
                   "border-green-200 text-green-700 bg-green-100",
                 )}
               >
@@ -37,11 +34,11 @@ function TargetArea({ tools, placeholder = "" }: TargetAreaProps) {
 }
 
 export function App() {
-  const { state, actions } = useToolsReducer();
+  const { lists, actions } = useToolsReducer();
 
   useEffect(() => {
     setTimeout(() => {
-      if (state.tools.length) {
+      if (lists.uncategorized.length) {
         actions.moveToBeginner("test");
       }
     }, 1000);
@@ -57,7 +54,7 @@ export function App() {
           <header>
             <h2 className="section-title">Tools</h2>
           </header>
-          <TargetArea placeholder="you did it 🎉" tools={state.tools} />
+          <TargetArea placeholder="you did it 🎉" tools={lists.uncategorized} />
         </section>
         <div className="space-y-5">
           <header className="space-y-1">
@@ -65,7 +62,7 @@ export function App() {
             <p className="text-sm">
               Heard or used once or twice. Requires a mentor to use effectively.
             </p>
-            <TargetArea placeholder="nothing there yet" tools={state.beginner} />
+            <TargetArea placeholder="nothing there yet" tools={lists.beginner} />
           </header>
           <header className="space-y-1">
             <h2 className="section-title">Self-sufficient</h2>
@@ -73,7 +70,7 @@ export function App() {
               Used multiple times. Had some paint points in the past and starts to understand best
               practices.
             </p>
-            <TargetArea placeholder="pick something from the list" tools={state.selfSufficient} />
+            <TargetArea placeholder="pick something from the list" tools={lists.selfSufficient} />
           </header>
           <header className="space-y-1">
             <h2 className="section-title">Advanced</h2>
@@ -81,7 +78,7 @@ export function App() {
               Knows best practices for the tool and can extend it for their use case. Can mentor
               less experienced team members.
             </p>
-            <TargetArea placeholder="c’mon, you can do it!" tools={state.advanced} />
+            <TargetArea placeholder="c’mon, you can do it!" tools={lists.advanced} />
           </header>
           <header className="space-y-1">
             <h2 className="section-title">Mastery</h2>
@@ -90,7 +87,7 @@ export function App() {
               alternatives. Can easily pin point use cases to the documentation and explain the
               complexity to beginners.
             </p>
-            <TargetArea placeholder="wow, such empty" tools={state.mastery} />
+            <TargetArea placeholder="wow, such empty" tools={lists.mastery} />
           </header>
         </div>
       </div>
