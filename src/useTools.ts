@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { useReducer } from "react";
-import { wrapObjectInDispatch } from "./utils";
+import { mapDispatchToActions } from "./utils";
 
 export interface Tool {
   id: string;
@@ -40,7 +40,7 @@ const toolsSlice = createSlice({
 
 export function useToolsReducer() {
   const [state, dispatch] = useReducer(toolsSlice.reducer, initialState);
-  const actions = wrapObjectInDispatch(dispatch, toolsSlice.actions);
+  const actions = mapDispatchToActions(dispatch, toolsSlice.actions);
 
   return {
     state,

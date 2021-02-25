@@ -1,9 +1,11 @@
 import mapValues from "lodash/fp/mapValues";
 import compose from "lodash/fp/compose";
 
-export function wrapObjectInDispatch<T extends Record<string, (...args: any[]) => any>>(
+type Fn = (...args: any[]) => any;
+
+export function mapDispatchToActions<T extends Record<string, Fn>>(
   dispatch: React.Dispatch<any>,
-  obj: T,
+  actions: T,
 ) {
-  return mapValues((fn) => compose(dispatch, fn), obj) as T;
+  return mapValues((fn) => compose(dispatch, fn), actions) as T;
 }
