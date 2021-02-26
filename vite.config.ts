@@ -8,4 +8,5 @@ export default defineConfig({
   esbuild: {
     jsxInject: `import React from 'react'`,
   },
+  base: process.env.NODE_ENV === 'production' && 'tools-seniority'
 });
