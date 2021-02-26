@@ -1,15 +1,27 @@
-import { useEffect } from "react";
 import { ToolCategory, useToolsReducer } from "./useTools";
 import { OnDropHandler, TargetArea } from "./DragAndDrop";
+import { FormEventHandler } from "react";
 
 export function App() {
-  const { lists, actions } = useToolsReducer();
+  const { state, lists, actions } = useToolsReducer();
 
-  const onDrop: OnDropHandler = (item, category) => {
+  const handleDrop: OnDropHandler = (item, category) => {
     actions.changeCategory({
-      id: item.id,
+      label: item.id,
       newCategory: category,
     });
+  };
+
+  const handleNewTool: FormEventHandler<AddToolFormElement> = (event) => {
+    event.preventDefault();
+    const newToolElement = event.currentTarget.elements["new-tool"];
+    const name = newToolElement.value;
+    if (state.tools.find((tool) => tool.label === name)) {
+      window.alert(`Tool "${name}" already exists!`);
+      return;
+    }
+    actions.addTool(name);
+    newToolElement.value = "";
   };
 
   return (
@@ -25,9 +37,10 @@ export function App() {
           <TargetArea
             placeholder="you did it 🎉"
             category={ToolCategory.Uncategorized}
-            onDrop={onDrop}
+            onDrop={handleDrop}
             tools={lists.uncategorized}
           />
+          <AddToolForm onSubmit={handleNewTool} />
         </section>
         <div className="space-y-5">
           <header className="space-y-1">
@@ -38,7 +51,7 @@ export function App() {
             <TargetArea
               placeholder="nothing there yet"
               category={ToolCategory.Beginner}
-              onDrop={onDrop}
+              onDrop={handleDrop}
               tools={lists.beginner}
             />
           </header>
@@ -51,7 +64,7 @@ export function App() {
             <TargetArea
               placeholder="pick something from the list"
               category={ToolCategory.SelfSufficient}
-              onDrop={onDrop}
+              onDrop={handleDrop}
               tools={lists.selfSufficient}
             />
           </header>
@@ -64,7 +77,7 @@ export function App() {
             <TargetArea
               placeholder="c’mon, you can do it!"
               category={ToolCategory.Advanced}
-              onDrop={onDrop}
+              onDrop={handleDrop}
               tools={lists.advanced}
             />
           </header>
@@ -78,12 +91,47 @@ export function App() {
             <TargetArea
               placeholder="wow, such empty"
               category={ToolCategory.Mastery}
-              onDrop={onDrop}
+              onDrop={handleDrop}
               tools={lists.mastery}
             />
           </header>
         </div>
       </div>
     </div>
+  );
+}
+
+interface AddToolFormElements extends HTMLFormControlsCollection {
+  "new-tool": HTMLInputElement;
+}
+
+interface AddToolFormElement extends HTMLFormElement {
+  elements: AddToolFormElements;
+}
+
+function AddToolForm({ onSubmit }: { onSubmit: FormEventHandler }) {
+  return (
+    <form onSubmit={onSubmit}>
+      <label className="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-2">
+        <span className="flex-shrink-0">Add new tool</span>
+        <input
+          type="text"
+          name="new-tool"
+          placeholder="eg. bash"
+          className="border border-gray px-2 py-1 rounded shadow-sm min-w-0"
+          autoComplete="off"
+        />
+        <button type="submit" className="h-6 w-6 flex-shrink-0">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+        </button>
+      </label>
+    </form>
   );
 }

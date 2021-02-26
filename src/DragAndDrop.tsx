@@ -18,7 +18,7 @@ interface DraggableItemProps {
 function DraggableItem({ tool }: DraggableItemProps) {
   const [, drag] = useDrag(() => ({
     item: {
-      id: tool.id,
+      id: tool.label,
       type: DRAG_TYPE,
       category: tool.category,
     } as DragItem,
@@ -75,11 +75,13 @@ export function TargetArea({ tools, category, onDrop, placeholder = "" }: Target
       {tools.length > 0 ? (
         <ul className="flex flex-wrap -m-0.75">
           {tools.map((tool) => {
-            return <DraggableItem key={tool.id} tool={tool} />;
+            return <DraggableItem key={tool.label} tool={tool} />;
           })}
         </ul>
       ) : (
-        <div className="text-sm text-gray-500 select-none leading-22px">{placeholder}</div>
+        <div className="text-sm text-gray-500 select-none leading-22px">
+          {canDrop && isOver ? "drop here" : placeholder}
+        </div>
       )}
     </div>
   );

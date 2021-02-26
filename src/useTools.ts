@@ -12,7 +12,6 @@ export enum ToolCategory {
 }
 
 export interface Tool {
-  id: string;
   label: string;
   category: ToolCategory;
 }
@@ -23,9 +22,9 @@ interface ToolsState {
 
 const initialState: ToolsState = {
   tools: [
-    { id: "react", label: "React", category: ToolCategory.Uncategorized },
-    { id: "vue", label: "Vue", category: ToolCategory.Uncategorized },
-    { id: "angular", label: "Angular", category: ToolCategory.Uncategorized },
+    { label: "React", category: ToolCategory.Uncategorized },
+    { label: "Vue", category: ToolCategory.Uncategorized },
+    { label: "Angular", category: ToolCategory.Uncategorized },
   ],
 };
 
@@ -33,12 +32,18 @@ const toolsSlice = createSlice({
   name: "tools",
   initialState,
   reducers: {
-    changeCategory(state, action: PayloadAction<{ id: string; newCategory: ToolCategory }>) {
+    changeCategory(state, action: PayloadAction<{ label: string; newCategory: ToolCategory }>) {
       state.tools = state.tools.map((tool) => {
-        if (tool.id === action.payload.id) {
+        if (tool.label === action.payload.label) {
           return { ...tool, category: action.payload.newCategory };
         }
         return tool;
+      });
+    },
+    addTool(state, action: PayloadAction<string>) {
+      state.tools.push({
+        label: action.payload,
+        category: ToolCategory.Uncategorized,
       });
     },
   },
