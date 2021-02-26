@@ -16,6 +16,9 @@ export function App() {
     event.preventDefault();
     const newToolElement = event.currentTarget.elements["new-tool"];
     const name = newToolElement.value;
+    if (name.trim().length === 0) {
+      return;
+    }
     if (state.tools.find((tool) => tool.label === name)) {
       window.alert(`Tool "${name}" already exists!`);
       return;
