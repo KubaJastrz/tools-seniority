@@ -1,6 +1,6 @@
 import { ToolCategory, useToolsReducer } from "./useTools";
-import { OnDropHandler, TargetArea } from "./DragAndDrop";
-import { FormEventHandler } from "react";
+import { OnClickHandler, OnDropHandler, TargetArea } from "./DragAndDrop";
+import { FormEventHandler, useCallback, useEffect, useState } from "react";
 
 export function App() {
   const { state, lists, actions } = useToolsReducer();
@@ -27,6 +27,8 @@ export function App() {
     newToolElement.value = "";
   };
 
+  const { isDeleteMode, setIsDeleteMode, handleDeleteClick } = useDeleteMode(actions.removeTool);
+
   return (
     <div className="p-8 space-y-6 max-w-5xl mx-auto">
       <p>
@@ -38,12 +40,22 @@ export function App() {
             <h2 className="section-title">Tools</h2>
           </header>
           <TargetArea
-            placeholder="you did it 🎉"
+            placeholder={state.tools.length > 0 ? "you did it 🎉" : "add something 👇"}
             category={ToolCategory.Uncategorized}
             onDrop={handleDrop}
+            onClick={handleDeleteClick}
+            isDeleteMode={isDeleteMode}
             tools={lists.uncategorized}
           />
           <AddToolForm onSubmit={handleNewTool} />
+          <label className="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-2">
+            <input
+              type="checkbox"
+              checked={isDeleteMode}
+              onChange={(event) => setIsDeleteMode(event.currentTarget.checked)}
+            />
+            <span className="text-red-600 text-sm">Enable delete mode</span>
+          </label>
         </section>
         <div className="space-y-5">
           <header className="space-y-1">
@@ -55,6 +67,8 @@ export function App() {
               placeholder="nothing there yet"
               category={ToolCategory.Beginner}
               onDrop={handleDrop}
+              onClick={handleDeleteClick}
+              isDeleteMode={isDeleteMode}
               tools={lists.beginner}
             />
           </header>
@@ -68,6 +82,8 @@ export function App() {
               placeholder="pick something from the list"
               category={ToolCategory.SelfSufficient}
               onDrop={handleDrop}
+              onClick={handleDeleteClick}
+              isDeleteMode={isDeleteMode}
               tools={lists.selfSufficient}
             />
           </header>
@@ -81,6 +97,8 @@ export function App() {
               placeholder="c’mon, you can do it!"
               category={ToolCategory.Advanced}
               onDrop={handleDrop}
+              onClick={handleDeleteClick}
+              isDeleteMode={isDeleteMode}
               tools={lists.advanced}
             />
           </header>
@@ -95,6 +113,8 @@ export function App() {
               placeholder="wow, such empty"
               category={ToolCategory.Mastery}
               onDrop={handleDrop}
+              onClick={handleDeleteClick}
+              isDeleteMode={isDeleteMode}
               tools={lists.mastery}
             />
           </header>
@@ -137,4 +157,42 @@ function AddToolForm({ onSubmit }: { onSubmit: FormEventHandler }) {
       </label>
     </form>
   );
+}
+
+function useDeleteMode(onDelete: (id: string) => void) {
+  const [isDeleteMode, setIsDeleteMode] = useState(false);
+  const handleDeleteClick: OnClickHandler = (item) => {
+    if (
+      isDeleteMode &&
+      window.confirm(`Are you sure you want to remove "${item.id}"? This cannot be undone.`)
+    ) {
+      onDelete(item.id);
+    }
+  };
+
+  const handleCtrlKeyDown = useCallback((event) => {
+    if (event.ctrlKey) {
+      setIsDeleteMode(true);
+    }
+  }, []);
+  const handleCtrlKeyUp = useCallback((event) => {
+    if (!event.ctrlKey) {
+      setIsDeleteMode(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleCtrlKeyDown);
+    document.addEventListener("keyup", handleCtrlKeyUp);
+    return () => {
+      document.removeEventListener("keydown", handleCtrlKeyDown);
+      document.removeEventListener("keyup", handleCtrlKeyUp);
+    };
+  }, []);
+
+  return {
+    isDeleteMode,
+    setIsDeleteMode,
+    handleDeleteClick,
+  };
 }

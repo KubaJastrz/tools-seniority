@@ -36,17 +36,25 @@ const toolsSlice = createSlice({
         }
         return tool;
       });
-      LocalStorage.setItem("tools", state.tools);
+      persistState(state);
     },
     addTool(state, action: PayloadAction<string>) {
       state.tools.push({
         label: action.payload,
         category: ToolCategory.Uncategorized,
       });
-      LocalStorage.setItem("tools", state.tools);
+      persistState(state);
+    },
+    removeTool(state, action: PayloadAction<string>) {
+      state.tools = state.tools.filter((tool) => tool.label !== action.payload);
+      persistState(state);
     },
   },
 });
+
+function persistState(state: ToolsState) {
+  LocalStorage.setItem("tools", state.tools);
+}
 
 export function useToolsReducer() {
   const [state, dispatch] = useReducer(toolsSlice.reducer, initialState);
