@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { useReducer } from "react";
 import groupBy from "lodash/fp/groupBy";
 import { mapDispatchToActions } from "./utils";
+import { LocalStorage } from "./LocalStorage";
 
 export enum ToolCategory {
   Uncategorized,
@@ -21,11 +22,7 @@ interface ToolsState {
 }
 
 const initialState: ToolsState = {
-  tools: [
-    { label: "React", category: ToolCategory.Uncategorized },
-    { label: "Vue", category: ToolCategory.Uncategorized },
-    { label: "Angular", category: ToolCategory.Uncategorized },
-  ],
+  tools: LocalStorage.getItem("tools", []),
 };
 
 const toolsSlice = createSlice({
@@ -39,12 +36,14 @@ const toolsSlice = createSlice({
         }
         return tool;
       });
+      LocalStorage.setItem("tools", state.tools);
     },
     addTool(state, action: PayloadAction<string>) {
       state.tools.push({
         label: action.payload,
         category: ToolCategory.Uncategorized,
       });
+      LocalStorage.setItem("tools", state.tools);
     },
   },
 });
